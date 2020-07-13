@@ -3,6 +3,7 @@ package com.odalovic.graphql.db
 import com.mongodb.client.MongoClient
 import com.mongodb.client.model.Filters
 import com.odalovic.graphql.NewOrder
+import org.bson.Document
 import org.bson.types.ObjectId
 import javax.enterprise.context.ApplicationScoped
 import javax.enterprise.inject.Default
@@ -34,12 +35,15 @@ class OrderService(@field:Default val mongoClient: MongoClient) {
     }
 
     fun deleteOrderItem(orderItemId: String): Long {
-        val match =
-            ordersCollection().find(Filters.eq("items._id", ObjectId(orderItemId))).first()
-                ?: error("NO such order item!")
-        println(match)
-        val deleteResult = ordersCollection().deleteOne(Filters.eq("items._id", ObjectId(orderItemId)))
-        return deleteResult.deletedCount
+        val findExistingOrderFilter = Filters.eq("items._id", orderItemId)
+        val existingOrder =
+            ordersCollection().find(findExistingOrderFilter).first()
+                ?: error("No such order containing item with ID $orderItemId")
+        val remainingItems = existingOrder.items.filterNot { it.id == orderItemId }
+        existingOrder.items = remainingItems
+        return ordersCollection().updateOne(findExistingOrderFilter, Document().apply {
+            set("items", remainingItems)
+        }).modifiedCount
     }
 
 }

@@ -10,7 +10,6 @@ import org.bson.codecs.Codec
 import org.bson.codecs.CollectibleCodec
 import org.bson.codecs.DecoderContext
 import org.bson.codecs.EncoderContext
-import org.bson.types.ObjectId
 import java.util.*
 
 class OrderCodec : CollectibleCodec<OrderEntity> {
@@ -26,7 +25,7 @@ class OrderCodec : CollectibleCodec<OrderEntity> {
             put("items", value.items.map {
                 BasicDBObject(
                     mapOf(
-                        "_id" to ObjectId(),
+                        "_id" to UUID.randomUUID().toString(),
                         "productName" to it.productName,
                         "quantity" to it.quantity
                     )
@@ -41,10 +40,10 @@ class OrderCodec : CollectibleCodec<OrderEntity> {
 
     override fun decode(reader: BsonReader, decoderContext: DecoderContext): OrderEntity {
         val rawDoc = documentCodec.decode(reader, decoderContext)
-        val itemsRaw = rawDoc["items"] as List<Document>
+        val itemsRaw = rawDoc["items"] as? List<Document> ?: error("unexpected type!")
         return OrderEntity(rawDoc.getObjectId("_id").toString(), itemsRaw.map {
             OrderItemEntity(
-                id = it.getObjectId("_id").toString(),
+                id = it.getString("_id"),
                 productName = it.getString("productName"),
                 quantity = it.getInteger("quantity")
             )
