@@ -1,9 +1,10 @@
 package com.odalovic.graphql.db
 
 import com.mongodb.client.MongoClient
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.Updates.set
 import com.odalovic.graphql.NewOrder
-import org.bson.Document
+import org.bson.BsonObjectId
 import org.bson.types.ObjectId
 import javax.enterprise.context.ApplicationScoped
 import javax.enterprise.inject.Default
@@ -18,7 +19,7 @@ class OrderService(@field:Default val mongoClient: MongoClient) {
         } catch (e: IllegalArgumentException) {
             return null
         }
-        return ordersCollection().find(Filters.eq("_id", objectId)).firstOrNull()
+        return ordersCollection().find(eq("_id", objectId)).firstOrNull()
     }
 
     private fun ordersCollection() =
@@ -31,19 +32,18 @@ class OrderService(@field:Default val mongoClient: MongoClient) {
                 quantity = it.quantity
             )
         }))
-        return result.insertedId?.toString() ?: error("No inserted id!?!?")
+        return (result.insertedId as BsonObjectId).value.toString()
     }
 
     fun deleteOrderItem(orderItemId: String): Long {
-        val findExistingOrderFilter = Filters.eq("items._id", orderItemId)
+        val findExistingOrderFilter = eq("items._id", orderItemId)
         val existingOrder =
             ordersCollection().find(findExistingOrderFilter).first()
                 ?: error("No such order containing item with ID $orderItemId")
-        val remainingItems = existingOrder.items.filterNot { it.id == orderItemId }
-        existingOrder.items = remainingItems
-        return ordersCollection().updateOne(findExistingOrderFilter, Document().apply {
-            set("items", remainingItems)
-        }).modifiedCount
+        return ordersCollection().updateOne(
+            findExistingOrderFilter, set("items",
+                existingOrder.items.filterNot { it.id == orderItemId })
+        ).modifiedCount
     }
 
 }
