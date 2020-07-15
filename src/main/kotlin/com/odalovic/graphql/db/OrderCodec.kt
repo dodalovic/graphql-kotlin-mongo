@@ -40,7 +40,7 @@ class OrderCodec : CollectibleCodec<OrderEntity> {
 
     override fun decode(reader: BsonReader, decoderContext: DecoderContext): OrderEntity {
         val rawDoc = documentCodec.decode(reader, decoderContext)
-        val itemsRaw = rawDoc["items"] as? List<Document>
+        val itemsRaw = rawDoc.getList("items", Document::class.java)
         return OrderEntity(rawDoc.getObjectId("_id").toString(), itemsRaw?.map {
             OrderItemEntity(
                 id = it.getString("_id"),
