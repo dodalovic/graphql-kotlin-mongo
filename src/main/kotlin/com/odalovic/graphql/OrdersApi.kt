@@ -30,6 +30,26 @@ class OrdersApi(private val orderService: OrderService) {
     @Description("Creates a new order comprising given items")
     fun createOrder(@Description("New order definition") newOrder: NewOrder) = orderService.createOrder(newOrder)
 
+    @Mutation("addOrderItem")
+    @Description("Merges (updates quantity) or adds a new order item to an existing order")
+    fun upsertOrderItem(orderId: String, orderItem: NewOrderItem) =
+        orderService.upsertOrderItem(orderId, orderItem).let { order ->
+            Order(
+                id = order.id!!,
+                items = order.items.map { item ->
+                    OrderItem(
+                        id = item.id!!,
+                        product = item.productName,
+                        quantity = item.quantity
+                    )
+                })
+        }
+
+    @Description("Delete the order by ID")
+    @Mutation
+    fun deleteOrder(@Description("Order ID to identify the order to be deleted") orderId: String) =
+        orderService.deleteOrder(orderId)
+
     @Mutation("deleteOrderItem")
     @Description("Deletes particular order item by given item ID")
     fun deleteOrderItem(@Description("Unique order item identifier") orderItemId: String) =
