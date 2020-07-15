@@ -1,9 +1,7 @@
 package com.odalovic.graphql.db
 
 import com.mongodb.client.MongoClient
-import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Filters.eq
-import com.mongodb.client.model.Updates
 import com.mongodb.client.model.Updates.set
 import com.odalovic.graphql.NewOrder
 import com.odalovic.graphql.NewOrderItem
