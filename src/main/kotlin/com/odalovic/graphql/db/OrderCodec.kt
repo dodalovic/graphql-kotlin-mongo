@@ -40,14 +40,14 @@ class OrderCodec : CollectibleCodec<OrderEntity> {
 
     override fun decode(reader: BsonReader, decoderContext: DecoderContext): OrderEntity {
         val rawDoc = documentCodec.decode(reader, decoderContext)
-        val itemsRaw = rawDoc["items"] as? List<Document> ?: error("unexpected type!")
-        return OrderEntity(rawDoc.getObjectId("_id").toString(), itemsRaw.map {
+        val itemsRaw = rawDoc["items"] as? List<Document>
+        return OrderEntity(rawDoc.getObjectId("_id").toString(), itemsRaw?.map {
             OrderItemEntity(
                 id = it.getString("_id"),
                 productName = it.getString("productName"),
                 quantity = it.getInteger("quantity")
             )
-        })
+        }.orEmpty())
     }
 
     override fun getDocumentId(document: OrderEntity) = BsonString(UUID.randomUUID().toString())

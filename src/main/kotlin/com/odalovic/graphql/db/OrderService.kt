@@ -2,9 +2,11 @@ package com.odalovic.graphql.db
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.Projections
 import com.mongodb.client.model.Updates.set
 import com.odalovic.graphql.NewOrder
 import com.odalovic.graphql.NewOrderItem
+import com.odalovic.graphql.OrderItem
 import org.bson.BsonObjectId
 import org.bson.types.ObjectId
 import java.util.*
@@ -21,7 +23,7 @@ class OrderService(@field:Default val mongoClient: MongoClient) {
         } catch (e: IllegalArgumentException) {
             return null
         }
-        return ordersCollection().find(eq("_id", objectId)).firstOrNull()
+        return ordersCollection().find(eq("_id", objectId)).projection(Projections.include("_id")).firstOrNull()
     }
 
     private fun ordersCollection() =
@@ -77,6 +79,16 @@ class OrderService(@field:Default val mongoClient: MongoClient) {
         }
         ordersCollection.updateOne(existingOrderFilter, set("items", futureItems))
         return ordersCollection.find(existingOrderFilter).first()!!
+    }
+
+    fun getItems(orderId: String): List<OrderItem> {
+        return (ordersCollection().find(eq("_id", ObjectId(orderId))).first() ?: error("No such order")).items.map {
+            OrderItem(
+                id = it.id!!,
+                product = it.productName,
+                quantity = it.quantity
+            )
+        }
     }
 
 }

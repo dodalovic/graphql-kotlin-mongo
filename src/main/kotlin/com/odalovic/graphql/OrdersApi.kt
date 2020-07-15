@@ -1,6 +1,5 @@
 package com.odalovic.graphql
 
-import com.odalovic.graphql.db.OrderEntity
 import com.odalovic.graphql.db.OrderService
 import org.eclipse.microprofile.graphql.*
 
@@ -10,21 +9,9 @@ class OrdersApi(private val orderService: OrderService) {
     @Query("order")
     @Description("Returns the order by given ID, or null if the order doesn't exist")
     fun getOrderById(@Description("Unique order identifier") @Name("orderId") orderId: String) =
-        orderService.findById(orderId)
-            ?.let { order ->
-                Order(
-                    order.id ?: error("Order without ID"),
-                    order.items.map { item ->
-                        OrderItem(
-                            item.id ?: error("Order item without ID!!!"),
-                            item.productName,
-                            item.quantity
-                        )
-                    })
-            }
+        orderService.findById(orderId)?.let { Order(it.id!!) } ?: error("No such order $orderId")
 
-    fun items(@Source orderEntity: OrderEntity) =
-        orderEntity.items.map { OrderItem(it.id ?: error("Order without ID!!!"), it.productName, it.quantity) }
+    fun items(@Source order: Order) = orderService.getItems(order.id)
 
     @Mutation("createOrder")
     @Description("Creates a new order comprising given items")
