@@ -19,6 +19,10 @@ You can run your application in dev mode that enables live coding using:
 ./mvnw quarkus:dev
 ```
 
+## Accessing graphql APIs
+
+Visit http://localhost:8080/graphql-ui in your browser, and query the schema with the provided UI
+
 ## Packaging and running the application
 
 The application can be packaged using `./mvnw package`.
