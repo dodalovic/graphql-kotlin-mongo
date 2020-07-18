@@ -28,7 +28,6 @@ class OrdersApiTest {
                   "query": "mutation CreateOrder { createOrder(newOrder:{ items: [ { productName: \"a\", quantity: 2 }]}) { createdOrderId\nerrors } }"
                 }""".trimIndent()
             ).`when`().post("/graphql")
-        println("Got response: ${response.asString()}")
         val createOrderResponse = response
             .then()
             .statusCode(200)
