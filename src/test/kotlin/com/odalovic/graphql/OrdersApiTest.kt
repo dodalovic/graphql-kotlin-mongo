@@ -21,13 +21,15 @@ class OrdersApiTest {
 
     @Test
     fun `creates new order`() {
-        val createOrderResponse = given()
+        val response = given()
             .headers(mutableMapOf("Accept" to "application/json", "Content-Type" to "application/json"))
             .body(
                 """{
                   "query": "mutation CreateOrder { createOrder(newOrder:{ items: [ { productName: \"a\", quantity: 2 }]}) { createdOrderId\nerrors } }"
                 }""".trimIndent()
             ).`when`().post("/graphql")
+        println("Got response: ${response.asString()}")
+        val createOrderResponse = response
             .then()
             .statusCode(200)
             .extract().`as`(MyCreateOrderResponse::class.java)
