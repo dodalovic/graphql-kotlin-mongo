@@ -34,7 +34,10 @@ class OrdersApi(private val orderService: OrderService) {
     @Mutation("addOrderItem")
     @Description("Merges (updates quantity) or adds a new order item to an existing order")
     fun upsertOrderItem(orderId: String, orderItem: NewOrderItem) =
-        orderService.upsertOrderItem(orderId, orderItem.toBusinessModel())
+        when (val result = orderService.upsertOrderItem(orderId, orderItem.toBusinessModel())) {
+            is Success -> GetOrderResponse(result.value.toGraphqlModel())
+            is Error -> GetOrderResponse(errors = listOf(result.message))
+        }.exhaustive
 
     @Description("Delete the order by ID")
     @Mutation

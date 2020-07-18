@@ -24,7 +24,6 @@ fun com.odalovic.graphql.businessmodels.Order.toGraphqlModel() = Order(id = this
 })
 
 
-
 fun NewOrder.toBusinessModel() =
     com.odalovic.graphql.businessmodels.NewOrder(this.items.map { item ->
         NewOrderItem(
