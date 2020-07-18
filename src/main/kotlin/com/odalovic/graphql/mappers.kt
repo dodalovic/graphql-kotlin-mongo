@@ -17,17 +17,13 @@ fun OrderEntity.toBusinessModel(): com.odalovic.graphql.businessmodels.Order {
 
 fun com.odalovic.graphql.businessmodels.OrderItem.toGraphqlModel() = OrderItem(id, productName, quantity)
 
-fun Order.toDto() = Order(id = this.id, items = items?.map { item ->
-    OrderItem(
-        id = item.id, productName = item.productName, quantity = item.quantity
-    )
-}.orEmpty())
-
 fun com.odalovic.graphql.businessmodels.Order.toGraphqlModel() = Order(id = this.id, items = this.items.map { item ->
     OrderItem(
         id = item.id, productName = item.productName, quantity = item.quantity
     )
 })
+
+
 
 fun NewOrder.toBusinessModel() =
     com.odalovic.graphql.businessmodels.NewOrder(this.items.map { item ->

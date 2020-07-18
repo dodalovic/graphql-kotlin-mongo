@@ -7,3 +7,5 @@ data class Success<out T : Any>(val value: T) : Outcome<T>()
 
 val <T> T.exhaustive
     get() = this
+
+annotation class NoArgConstructor
