@@ -1,5 +1,6 @@
 package com.odalovic.graphql
 
+import com.odalovic.graphql.Outcome.*
 import org.eclipse.microprofile.graphql.*
 
 @GraphQLApi
