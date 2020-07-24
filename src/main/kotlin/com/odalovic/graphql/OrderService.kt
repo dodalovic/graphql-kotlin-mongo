@@ -4,7 +4,8 @@ import com.mongodb.client.MongoClient
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.Projections
 import com.mongodb.client.model.Updates.set
-import com.odalovic.graphql.Outcome.*
+import com.odalovic.graphql.Outcome.Error
+import com.odalovic.graphql.Outcome.Success
 import com.odalovic.graphql.businessmodels.NewOrder
 import com.odalovic.graphql.businessmodels.NewOrderItem
 import com.odalovic.graphql.businessmodels.Order
