@@ -16,11 +16,9 @@ import org.bson.BsonObjectId
 import org.bson.types.ObjectId
 import java.util.*
 import javax.enterprise.context.ApplicationScoped
-import javax.enterprise.inject.Default
-
 
 @ApplicationScoped
-class OrderService(@field:Default val mongoClient: MongoClient) {
+class OrderService(val mongoClient: MongoClient) {
 
     fun findById(orderId: String): Outcome<Order> {
         val objectId = try {
